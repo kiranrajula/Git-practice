@@ -1,3 +1,11 @@
-stage('clone') {
-    sh 'Hello World'
+pipeline {
+    agent any
+
+    stages {
+        stage('Hello') {
+            steps {
+                sh 'echo "Hello, World!"'
+            }
+        }
+    }
 }
