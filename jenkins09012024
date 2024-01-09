@@ -1,0 +1,29 @@
+pipeline {
+    agent any
+    environment {
+        registry = "575595305155.dkr.ecr.us-east-1.amazonaws.com/jenkins_ecr"
+        dockerImageTag = "1.0" // Specify your desired tag here
+    }
+    stages {
+        stage('Code Checkout') {
+            steps {
+               checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: '123456', url: 'https://github.com/kiranrajula/Git-practice.git']])
+            }
+        }
+        stage('Building image') {
+            steps {
+                script {
+                    dockerImage = docker.build("${registry}:${dockerImageTag}")
+                }
+            }
+        }
+        stage('Pushing to ECR') {
+            steps {
+                script {
+                    sh 'aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 575595305155.dkr.ecr.us-east-1.amazonaws.com'
+                    sh "docker push ${registry}:${dockerImageTag}"
+                }
+            }
+        }
+    }
+}
